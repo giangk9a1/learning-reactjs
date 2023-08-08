@@ -1,25 +1,20 @@
-import logo from './logo.svg';
-import './App.css';
+import Counter from './Counter';
+import { Header, HeaderNumber } from './Header'
 
-console.log('logo', logo)
 // Component
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Header />
+      <p>{HeaderNumber}</p>
+      <hr />
+      <Counter />
+      <hr />
+      <Counter initCounter={10} step={10} />
+      <hr />
+      <Counter initCounter={100} step={20} />
+      <hr />
+      <Counter initCounter={1000} step={30} />
     </div>
   );
 }

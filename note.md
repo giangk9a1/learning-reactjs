@@ -8,3 +8,6 @@
 - Babel: https://babeljs.io/ Là trình biên dịch cho Javascript
 - Webpack
 - node_modules: Chứa tất cả packages, libs cần để chạy dự án
+- https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
+- State
+- Props
