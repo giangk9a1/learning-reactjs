@@ -9,5 +9,9 @@
 - Webpack
 - node_modules: Chứa tất cả packages, libs cần để chạy dự án
 - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
+- Arrow Function
+- let, const
+- Spread Operator, Rest Params
 - State
 - Props
+- ReactJs sex So sanh state moi, va state cu. Neu bang nhau -> Khong render lai. Neu khac nhau -> render lai
