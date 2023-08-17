@@ -1,17 +1,28 @@
 import { useState, useRef } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
+import { validateFormData, transformFormValue } from './utils'
+import InputNumber from 'rc-input-number';
+import './ProductList.css'
 
 function ProductList() {
   const refInputNameEl = useRef(null);
 
   const [error, setError] = useState("");
-  const [formData, setFormData] = useState({ name: "", price: "", discount: "" });
-  const [formError, setFormError] = useState({ name: "", price:"", discount: "" });
+  const [formData, setFormData] = useState({
+    name: "",
+    price: "",
+    discount: "",
+  });
+  const [formError, setFormError] = useState({
+    name: "",
+    price: "",
+    discount: "",
+  });
   const [productList, setProductList] = useState([
-    { id: 10, name: "Dien thoai Samsung", price: 100000, discount:0 },
-    { id: 11, name: "Dien thoai Oppo", price: 110000, discount:50 },
-    { id: 12, name: "Dien thoai Apple", price: 120000, discount:20 },
+    { id: 10, name: "Dien thoai Samsung", price: 100000, discount: 0 },
+    { id: 11, name: "Dien thoai Oppo", price: 110000, discount: 50 },
+    { id: 12, name: "Dien thoai Apple", price: 120000, discount: 20 },
   ]);
 
   const [productToDelete, setProductToDelete] = useState(null);
@@ -27,35 +38,35 @@ function ProductList() {
     // }
 
     setError("");
-  //  setProductName("");
+    //  setProductName("");
     // setProductList([
     //   ...productList,
     //   { id: parseInt(Math.random() * 999), name: productName.trim() },
     // ]);
   }
 
-  function onChangeFormData(event) {
-   // setProductName(event.target.value);
-    const key = event.target.name
-    const value = event.target.value
-    console.log("key", key)
-    console.log('value', value)
-    setFormData({...formData,key:value})
-  }
+  function onChangeFormData(event, key) {
+    const inputValue = event.target.value;
 
+    const error = validateFormData(key, inputValue)
+    const value = transformFormValue(key, inputValue, error)
+
+    setFormData({ ...formData, [key]: value });
+    setFormError({ ...formError, [key]: error })
+  }
+  console.log('formData', formData)
+  // console.log('formError', formError)
   function handleEditName(event) {
-    setProductToEdit({...productToEdit, name: event.target.value })
+    setProductToEdit({ ...productToEdit, name: event.target.value });
   }
   function handleEditProduct(event) {
-    event.preventDefault()
-    const newProductList = productList.map(p =>
-      p.id === productToEdit.id
-        ? { ...p, name: productToEdit.name }
-        : p
-    )
+    event.preventDefault();
+    const newProductList = productList.map((p) =>
+      p.id === productToEdit.id ? { ...p, name: productToEdit.name } : p
+    );
 
-    setProductList(newProductList)
-    setProductToEdit(null)
+    setProductList(newProductList);
+    setProductToEdit(null);
   }
   const handleClose = () => {
     setProductToDelete(null);
@@ -80,35 +91,90 @@ function ProductList() {
           <input
             ref={refInputNameEl}
             type="text"
-            className={formError.name ? "is-invalid form-control" : "form-control"}
+            className={
+              formError.name ? "is-invalid form-control" : "form-control"
+            }
             placeholder="Nhap ten san pham"
             value={formData.name}
-            onChange={onChangeFormData}
-            name="name"
+            onChange={(event) => onChangeFormData(event, 'name')}
           />
-          {formError.name && <div className="invalid-feedback">{formError.name}</div>}
+          {formError.name && (
+            <div className="invalid-feedback">{formError.name}</div>
+          )}
         </div>
         <div>
-          <input
-            type="number"
-            className={formError.price ? "is-invalid form-control" : "form-control"}
+          <InputNumber
+            min={0}
+            step={1}
+            // defaultValue={3123124.934}
+            value={formData.price}
+            onChange={(newPrice) => {
+              const event = { target: { value: newPrice || '' } }
+              console.log('onChange Input Number', newPrice)
+              onChangeFormData(event, 'price')
+            }}
+            onInput={(inputPrice) => {
+              console.log('inputPrice', inputPrice)
+            }}
+            prefixCls="giang"
+            placeholder="Nhap gia"
+            formatter={((value, {userTyping, input}) => {
+              if (userTyping) {
+                console.log('input', input)
+                return input;
+              }
+
+              const formattedValue = String(value).replace('.',',').split(',').map((num, idx) => {
+                if (idx === 0) {
+                  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num).replace(' ₫', '')
+                }
+            
+                return num
+              }).join(',')
+              console.log('formattedValue', formattedValue)
+              return formattedValue
+            })}
+            // formatter={(value, { userTyping, input }) => {
+            //   if (userTyping) {
+            //     return input;
+            //   }
+            //   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)
+            // }}
+            pattern="\d*"
+            parser={formattedValue => {
+              // 3.123.124,934
+              // replaceAll '.' -> '' 3123124,934
+              // replace ',' -> '.' 3123124.934
+              return formattedValue.replace(/\./g, '').replace(',', '.')
+            }}
+            inputMode="numeric"
+          />
+          {/* <input
+            type="text"
+            className={
+              formError.price ? "is-invalid form-control" : "form-control"
+            }
             placeholder="Nhap gia"
             value={formData.price}
-            onChange={onChangeFormData}
-            name="price"
-          />
-          {formError.price && <div className="invalid-feedback">{formError.price}</div>}
+            onChange={(event) => onChangeFormData(event, 'price')}
+          /> */}
+          {formError.price && (
+            <div className="invalid-feedback">{formError.price}</div>
+          )}
         </div>
         <div>
           <input
-            type="number"
-            className={formError.discount ? "is-invalid form-control" : "form-control"}
+            type="text"
+            className={
+              formError.discount ? "is-invalid form-control" : "form-control"
+            }
             placeholder="Nhap Giam gia"
             value={formData.discount}
-            onChange={onChangeFormData}
-            name="discount"
+            onChange={(event) => onChangeFormData(event, 'discount')}
           />
-          {formError.discount && <div className="invalid-feedback">{formError.discount}</div>}
+          {formError.discount && (
+            <div className="invalid-feedback">{formError.discount}</div>
+          )}
         </div>
         <button className="btn btn-primary" style={{ whiteSpace: "nowrap" }}>
           Them Moi
@@ -123,7 +189,7 @@ function ProductList() {
                   className="d-flex justify-content-between list-group-item"
                   key={productItem.id}
                 >
-                  {productToEdit?.id === productItem.id ?  (
+                  {productToEdit?.id === productItem.id ? (
                     <form className="d-flex justify-content-between w-100">
                       <div>
                         <input
@@ -194,4 +260,5 @@ function ProductList() {
   );
 }
 
+// https://www.npmjs.com/package/react-number-format
 export default ProductList;
