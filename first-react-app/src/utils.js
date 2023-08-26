@@ -1,48 +1,63 @@
-export function validateFormData(key, value) {
-  if (key === 'price') return ''
-
+export function validateFormField(key, value, callback) {
   let error = ''
-  const isValueEmpty = !value.trim()
-  const transformValue = value.replace(',', '.')
 
-  if (key === 'name' && isValueEmpty) {
+  if (key === 'name' && !value.trim()) {
     error = 'Tên không hợp lệ'
+    // ten bi trung??
   }
 
-  // if (key === 'price') {
-    
-  //   if (isValueEmpty) {
-  //     error = 'Giá sản phẩm là trường dữ liệu bắt buộc'
-  //   } else if (isNaN(Number(transformValue))) {
-  //     error = 'Giá sản phẩm không hợp lệ'
-  //   } else if (Number(transformValue) <= 0) {
-  //     error = 'Giá sản phẩm phải lớn hơn 0'
-  //   }
-  // }
-
-  if (key === 'discount' && !isValueEmpty) {
-    if (isNaN(Number(transformValue))) {
-      error = 'Phần trăm giảm giá sản phẩm không hợp lệ'
-    } else if (Number(transformValue) < 0 || Number(transformValue) > 100) {
-      error = 'Phần trăm giảm giá phải nằm trong khoảng 0 -> 100'
+  if (key === 'price') {
+    if (typeof value === 'string' && !value.trim()) {
+      error = 'Giá sản phẩm là trường dữ liệu bắt buộc'
+    } else if (value <= 0) {
+      error = 'Giá sản phẩm phải lớn hơn 0'
     }
   }
 
-  return error
+  return callback ? callback(error) : error
 }
 
-export function transformFormValue(key, value, error) {
-  if (error) {
-    return value
+export function validateFullField(formData) {
+  const formError = {}
+
+  const listKeysField = Object.keys(formData) // ['name', 'price', 'discount']
+
+  listKeysField.forEach((key, index) => {
+    const value = formData[key]
+    formError[key] = validateFormField(key, value)
+  })
+  console.log('formError', formError)
+  return formError
+}
+
+export const priceFormatter = ((value, { userTyping, input }) => {
+  console.log(value, userTyping, input) // '' - false - ''
+  if (userTyping) {
+    return input;
   }
 
-  if (['discount'].includes(key)) {
-    if (value.includes(',')) {
-      return Number(value.replace(',', '.'))
+  if (!value) {
+    return ''
+  }
+
+  const formattedValue = String(value).replace('.',',').split(',').map((num, idx) => {
+    if (idx === 0) {
+      return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num).replace(' ₫', '')
     }
-    return Number(value)
-  }
 
-  // Defaul la string. Khong bien doi gi ca
-  return value
+    return num
+  }).join(',')
+
+  return formattedValue
+})
+
+export const priceParser = formattedValue => {
+  // 3.123.124,934
+  // replaceAll '.' -> '' 3123124,934
+  // replace ',' -> '.' 3123124.934
+  return formattedValue.replace(/\./g, '').replace(',', '.')
+}
+
+export const isExistError = (formError) => {
+  return Object.keys(formError).find(key => formError[key])
 }
