@@ -22,6 +22,11 @@
   box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
 }
 
+.giang input:disabled {
+  background-color: var(--bs-secondary-bg);
+  opacity: 1;
+}
+
 .giang.is-invalid input {
   border-color: var(--bs-form-invalid-border-color);
   padding-right: calc(1.5em + 0.75rem);

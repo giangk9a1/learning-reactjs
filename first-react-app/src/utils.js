@@ -30,7 +30,7 @@ export function validateFullField(formData) {
   return formError
 }
 
-export const priceFormatter = ((value, { userTyping, input }) => {
+export const priceFormatter = ((value, { userTyping = false, input } = {}) => {
   console.log(value, userTyping, input) // '' - false - ''
   if (userTyping) {
     return input;
@@ -60,4 +60,26 @@ export const priceParser = formattedValue => {
 
 export const isExistError = (formError) => {
   return Object.keys(formError).find(key => formError[key])
+}
+
+// export function onChange(event, key, setData, setError) {
+//   const value = event.target.value;
+//   const error = validateFormField(key, value)
+
+//   setData((data) => ({ ...data, [key]: value }))
+//   setError((dataError) => {
+//     return { ...dataError, [key]: error }
+//   })
+// }
+
+export function onChangeCreator(setData, setError) {
+  return (event, key) => {
+    const value = event.target.value;
+    const error = validateFormField(key, value)
+
+    setData((data) => ({ ...data, [key]: value }))
+    setError((dataError) => {
+      return { ...dataError, [key]: error }
+    })
+  }
 }

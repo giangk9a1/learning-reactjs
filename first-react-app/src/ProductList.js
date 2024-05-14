@@ -30,7 +30,7 @@ function ProductList() {
   ]);
 
   const [productToDelete, setProductToDelete] = useState(null);
-  const [productToEdit, setProductToEdit] = useState(null);
+ // const [productToEdit, setProductToEdit] = useState(null);
 
   // onSubmit
   function handleAddNewProduct(event) {
@@ -63,19 +63,16 @@ function ProductList() {
     setFormData({ ...formData, [key]: value });
     setFormError({ ...formError, [key]: error })
   }
-  // console.log('formData', formData)
-  // console.log('formError', formError)
-  function handleEditName(event) {
-    setProductToEdit({ ...productToEdit, name: event.target.value });
-  }
-  function handleEditProduct(event) {
-    event.preventDefault();
-    const newProductList = productList.map((p) =>
-      p.id === productToEdit.id ? { ...p, name: productToEdit.name } : p
-    );
 
-    setProductList(newProductList);
-    setProductToEdit(null);
+  function handleEditProduct(productToEdit) {
+    // const newProductList = productList.map((p) =>
+    //   p.id === productToEdit.id ? { ...p, name: productToEdit.name, price:productToEdit.price,discount:productToEdit.discount } : p
+    // );
+    setProductList(productList.map((p) =>
+      p.id === productToEdit.id ? productToEdit : p
+    ))
+    //setProductList(newProductList);
+ //   setProductToEdit(null);
   }
   const handleClose = () => {
     setProductToDelete(null);
@@ -138,7 +135,7 @@ function ProductList() {
             value={formData.discount}
             onChange={(newDiscount) => {
               const event = { target: { value: newDiscount ?? '' } }
-              console.log('onChange Input Discount', newDiscount)
+            //  console.log('onChange Input Discount', newDiscount)
               onChangeFormData(event, 'discount')
             }}
             prefixCls="giang"
@@ -161,8 +158,7 @@ function ProductList() {
                 <ProductItem
                   key={productItem.id}
                   productItem={productItem}
-                  productToEdit={productToEdit}
-                  setProductToEdit={setProductToEdit}
+                  handleEditProduct={handleEditProduct}
                   setProductToDelete={setProductToDelete}
                 />
               )
